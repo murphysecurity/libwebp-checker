@@ -50,13 +50,13 @@
 #### 扫描指定目录路径
 
 ```
-bash libwebp-scan-tools.sh --token Your_Token_From_Console -f /path_you_want_scan/
+bash libwebp-checker.sh --token Your_Token_From_Console -f /path_you_want_scan/
 ```
 
 #### 扫描当前服务器的所有进程文件
 
 ```
-bash libwebp-scan-tools.sh --token Your_Token_From_Console -p
+bash libwebp-checker.sh --token Your_Token_From_Console -p
 ```
 
 

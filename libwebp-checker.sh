@@ -42,6 +42,23 @@ function check_file_hash() {
     return 0
 }
 
+function check_binary() {
+    filepath="$1"
+    extracted_file="$2"
+    # 使用 file 命令检测文件类型
+    filetype=$(file "$extracted_file" 2>/dev/null)
+    if echo "$filetype" | grep -q -e "ELF" -e "executable" -e "shared object" -e "shared library"; then
+        # 通过strings和fgrep搜索二进制文件
+        matched_strings=$(strings "$extracted_file" | fgrep -o -e 'WebPCopyPlane' -e 'WebPCopyPixels' -e 'VP8LBuildHuffmanTable' 2>/dev/null)
+        safe_strings=$(strings "$extracted_file" | fgrep -o -e 'VP8LHuffmanTablesAllocate' 2>/dev/null)
+        if [[ ! -z "$matched_strings" ]] && [[ -z "$safe_strings" ]]; then
+            extracted_filepath_stripped=$(echo "$extracted_file" | sed "s|^$temp_dir||")
+            echo -n "Affected file: $filepath, $extracted_filepath_stripped, Matched String: "
+            echo "$matched_strings" | tr '\n' ',' | sed 's/,$/\n/'
+        fi
+    fi
+}
+
 PARAM_OFFSET=$(($#-1))
 PARAM_LEN=$#
 PARAM_VALUE=${!PARAM_LEN}
@@ -60,7 +77,8 @@ if [ ${PARAM_VALUE} = "-p" ]; then
             if echo "$filetype" | grep -q -e "ELF" -e "executable" -e "shared object" -e "shared library"; then
                 # 检查文件内容
                 matched_strings=$(strings "$file" | fgrep -o -e 'WebPCopyPlane' -e 'WebPCopyPixels' -e 'VP8LBuildHuffmanTable' 2>/dev/null)
-                if [ ! -z "$matched_strings" ]; then
+                safe_strings=$(strings "$file" | fgrep -o -e 'VP8LHuffmanTablesAllocate' 2>/dev/null)
+                if [[ ! -z "$matched_strings" ]] && [[ -z "$safe_strings" ]]; then
                     echo -n "Affected file: $file, Matched String: "
                     echo "$matched_strings" | tr '\n' ',' | sed 's/,$/\n/'
                 fi
@@ -73,7 +91,7 @@ elif [ ${!PARAM_OFFSET} = "-f" ]; then
         echo "Usage: $0 -f directory"
         exit 1
     fi
-    
+
     find "$PARAM_VALUE" -type f | while read -r file; do
         # 如果是jar则解压
         case "$file" in
@@ -89,16 +107,8 @@ elif [ ${!PARAM_OFFSET} = "-f" ]; then
                 abs_file=$(readlink -f "$file")
                 (cd $temp_dir && jar -xf "$abs_file")
                 find "$temp_dir" -type f | while read -r extracted_file; do
-                    filetype=$(file "$extracted_file" 2>/dev/null)
-                    # 判断为可执行文件的，比对字符串
-                    if echo "$filetype" | grep -q -e "ELF" -e "executable" -e "shared object" -e "shared library"; then
-                        matched_strings=$(strings "$extracted_file" | fgrep -o -e 'WebPCopyPlane' -e 'WebPCopyPixels' -e 'VP8LBuildHuffmanTable' 2>/dev/null)
-                        if [ ! -z "$matched_strings" ]; then
-                            extracted_filepath_stripped=$(echo "$extracted_file" | sed "s|^$temp_dir||")
-                            echo -n "Affected file: $file, $extracted_filepath_stripped, Matched String: "
-                            echo "$matched_strings" | tr '\n' ',' | sed 's/,$/\n/'
-                        fi
-                    fi
+                    # 识别每个提取后的文件
+                    check_binary "$file" "$extracted_file"
                     # 判断为 jar 的，比对哈希
                     if [[ "$extracted_file" == *.jar ]]; then
                         # 获取 jar 结尾的内容并进行哈希匹配
@@ -114,36 +124,17 @@ elif [ ${!PARAM_OFFSET} = "-f" ]; then
             # 提取文件名，解压文件并检查内容
             basefile=$(basename "$file")
             temp_dir=$(mktemp -d -t "${basefile}-XXXXXX")
-            # 解压 RPM 文件并检查内容
+            # 解压 RPM 文件并检查内容            
             rpm2cpio "$file" | cpio -idmv -D "$temp_dir" >/dev/null 2>&1
             find "$temp_dir" -type f | while read -r extracted_file; do
-                # 使用 file 命令检测文件类型
-                filetype=$(file "$extracted_file" 2>/dev/null)
-                if echo "$filetype" | grep -q -e "ELF" -e "executable" -e "shared object" -e "shared library"; then
-                    matched_strings=$(strings "$extracted_file" | fgrep -o -e 'WebPCopyPlane' -e 'WebPCopyPixels' -e 'VP8LBuildHuffmanTable'  2>/dev/null)
-                    if [ ! -z "$matched_strings" ]; then
-                        extracted_filepath_stripped=$(echo "$extracted_file" | sed "s|^$temp_dir||")
-                        echo -n "Affected file: $file, $extracted_filepath_stripped, Matched String: "
-                        echo "$matched_strings" | tr '\n' ',' | sed 's/,$/\n/'
-                    fi
-                fi
+                # 识别每个提取后的文件
+                check_binary "$file" "$extracted_file"
             done
             rm -rf "$temp_dir"
             ;;
 
         *)
-            # 使用 file 命令检测文件类型
-            filetype=$(file "$file" 2>/dev/null)
-            if echo "$filetype" | grep -q -e "ELF" -e "executable" -e "shared object" -e "shared library"; then
-                # fgrep -o -a 命令将以文本方式搜索二进制文件
-                matched_strings=$(strings "$file" | fgrep -o -e 'WebPCopyPlane' -e 'WebPCopyPixels' -e 'VP8LBuildHuffmanTable' 2>/dev/null)
-                if [ ! -z "$matched_strings" ]; then
-                    extracted_filepath_stripped=$(echo "$extracted_file" | sed "s|^$temp_dir||")
-                    echo -n "Affected file: $file, $extracted_filepath_stripped, Matched String: "
-                    echo "$matched_strings" | tr '\n' ',' | sed 's/,$/\n/'
-                fi
-
-            fi
+            check_binary "$file" "$file"
             ;;
         esac
     done

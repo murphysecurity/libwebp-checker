@@ -9,7 +9,7 @@ This tool checks if your server's application or process that is affected by CVE
 
 Scan Result
 
-
+libwebp-checker.sh
   <img alt="scan result" src="./assets/scan-process-result.png" width="80%">
 
 
@@ -47,13 +47,13 @@ Go to [MurphySec platform - Access Token](https://www.murphysec.com/console/set/
 #### Scan Specific Directory Path
 
 ```
-bash libwebp-scan-tools.sh --token Your_Token_From_Console -f /path_you_want_scan/
+bash libwebp-checker.sh --token Your_Token_From_Console -f /path_you_want_scan/
 ```
 
 #### Scan All Process 
 
 ```
-bash libwebp-scan-tools.sh --token Your_Token_From_Console -p
+bash libwebp-checker.sh --token Your_Token_From_Console -p
 ```
 
 
