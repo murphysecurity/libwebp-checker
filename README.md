@@ -9,7 +9,6 @@ This tool checks if your server's application or process that is affected by CVE
 
 Scan Result
 
-libwebp-checker.sh
   <img alt="scan result" src="./assets/scan-process-result.png" width="80%">
 
 
