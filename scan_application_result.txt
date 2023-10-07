@@ -1,9 +1,0 @@
-Affected file: /Applications//DingTalk.app/Contents/MacOS/DingTalk, Matched String: WebPCopyPlane,WebPCopyPlane
-Affected file: /Applications//DingTalk.app/Contents/Frameworks/Tblive.app/Contents/Resources/bin/gray/race.framework/Versions/A/Frameworks/libopencv_imgcodecs.4.1.dylib, Matched String: WebPCopyPixels,WebPCopyPlane
-Affected file: /Applications//DingTalk.app/Contents/Frameworks/Tblive.app/Contents/Resources/bin/QtDeps/plugins/imageformats/libqwebp.dylib, Matched String: WebPCopyPlane,WebPCopyPixels,WebPCopyPlane,WebPCopyPixels
-Affected file: /Applications//TencentMeeting.app/Contents/Frameworks/WeMeetFramework.framework/Versions/3.19.22.429/PlugIns/imageformats/libqwebp.dylib, Matched String: WebPCopyPlane,WebPCopyPixels
-Affected file: /Applications//TencentMeeting.app/Contents/Frameworks/WeMeetFramework.framework/Versions/3.19.22.429/Frameworks/libskia.dylib, Matched String: WebPCopyPixels,WebPCopyPlane
-Affected file: /Applications//WeChat.app/Contents/MacOS/WeChat, Matched String: WebPCopyPlane,WebPCopyPlane
-Affected file: /Applications//IntelliJ IDEA.app/Contents/plugins/webp/lib/libwebp/mac/libwebp_jni64.dylib, Matched String: WebPCopyPixels,WebPCopyPlane
-Affected file: /Applications//企业微信.app/Contents/PlugIns/imageformats/libqwebp.dylib, Matched String: WebPCopyPlane,WebPCopyPixels,WebPCopyPixels,WebPCopyPlane,WebPCopyPlane,WebPCopyPlane,WebPCopyPixels,WebPCopyPixels,WebPCopyPixels,WebPCopyPixels,WebPCopyPixels,WebPCopyPlane,WebPCopyPixels
-Affected file: /Applications//企业微信.app/Contents/Frameworks/WWMeeting.app/Contents/PlugIns/imageformats/libqwebp.dylib, Matched String: WebPCopyPlane,WebPCopyPixels
